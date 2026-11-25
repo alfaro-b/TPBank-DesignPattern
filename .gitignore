@@ -1,0 +1,14 @@
+# Fichiers Java compilés
+bin/
+*.class
+
+# Fichiers de configuration locale Eclipse
+.settings/
+.metadata/
+
+# Bibliothèques Java externes
+lib/*.jar
+
+# Identifiants de connexion à la base de données
+db.properties
+.env

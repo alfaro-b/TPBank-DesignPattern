@@ -1,0 +1,57 @@
+
+@startuml
+
+title TP Bank - Diagramme de packages
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+
+package "application" as app #EAF4FF {
+    card "Main\nBankConsole"
+}
+
+package "business" as business #F3ECFF {
+    card "Règles métier\nBankService"
+}
+
+package "entities" as entities #EAFBF0 {
+    card "Client, Account,\nOperation..."
+}
+
+package "dao" as dao #EAF0FF {
+    card "Accès aux données\nRequêtes SQL"
+}
+
+package "singleton" as singleton #FFF1DD {
+    card "DatabaseConnection\nGestion de la connexion JDBC"
+}
+
+package "factory" as factory #E8FCF7 {
+    card "AccountFactory\nCréation des comptes"
+}
+
+package "exception" as exception #FFECEC {
+    card "Exceptions métier"
+}
+
+database "MySQL" as db #F7F7F7
+
+' Dépendances entre les packages
+
+app ..> business
+business ..> dao
+business ..> entities
+
+dao ..> entities
+dao ..> singleton
+dao ..> factory
+
+factory ..> entities
+business -right..> exception
+app ..> exception
+
+singleton -down-> db
+
+@enduml

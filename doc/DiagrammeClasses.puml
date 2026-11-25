@@ -1,0 +1,54 @@
+
+@startuml
+
+skinparam classAttributeIconSize 0
+
+title TP Bank - Diagramme de classes
+
+package entities {
+
+    class Client {
+        - id : int
+        - firstName : String
+        - lastName : String
+    }
+
+    abstract class Account {
+        - id : int
+        - balance : BigDecimal
+
+        + deposit(amount : BigDecimal) : void
+        + withdraw(amount : BigDecimal) : void
+    }
+
+    class CurrentAccount {
+    }
+
+    class SavingsAccount {
+        - interestRate : BigDecimal
+
+        + calculateInterest() : BigDecimal
+    }
+
+    class Operation {
+        - id : int
+        - amount : BigDecimal
+        - type : OperationType
+        - date : LocalDateTime
+    }
+
+    enum OperationType {
+        DEPOSIT
+        WITHDRAWAL
+    }
+
+    Client "1" -- "0..*" Account : possède
+    Account "1" -- "0..*" Operation
+
+    Account <|-- CurrentAccount
+    Account <|-- SavingsAccount
+
+    Operation ..> OperationType
+}
+
+@enduml

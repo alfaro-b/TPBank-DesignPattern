@@ -55,7 +55,7 @@ package entities <<Folder>> #EAFBF0 {
     }
 
     Client "1" <-- "0..*" Account : appartient à
-    Account "1" -- "0..*" Operation
+    Account "1" <-- "0..*" Operation
 
     Account <|-- CurrentAccount
     Account <|-- SavingsAccount

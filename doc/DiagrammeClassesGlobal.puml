@@ -1,0 +1,127 @@
+@startuml
+
+title TP Bank - Diagramme de classes global
+
+top to bottom direction
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam linetype ortho
+
+skinparam nodesep 60
+skinparam ranksep 60
+
+package application <<Folder>> #EAF4FF {
+    class Main
+    class BankConsole
+}
+
+package business <<Folder>> #F3ECFF {
+    class BankService
+}
+
+package dao <<Folder>> #EAF0FF {
+    class ClientDAO
+    class AccountDAO
+    class OperationDAO
+}
+
+package entities <<Folder>> #EAFBF0 {
+    class Client {
+        - id : int
+        - firstName : String
+        - lastName : String
+    }
+
+    abstract class Account {
+        - id : int
+        - balance : BigDecimal
+        + deposit(amount : BigDecimal) : void
+        + withdraw(amount : BigDecimal) : void
+    }
+
+    class CurrentAccount
+
+    class SavingsAccount {
+        - interestRate : BigDecimal
+        + calculateInterest() : BigDecimal
+    }
+
+    class Operation {
+        - id : int
+        - amount : BigDecimal
+        - type : String
+        - date : LocalDateTime
+    }
+
+    Client "1" -- "0..*" Account : possède
+    Account "1" -- "0..*" Operation
+
+    Account <|-- CurrentAccount
+    Account <|-- SavingsAccount
+}
+
+package singleton <<Folder>> #FFF1DD {
+
+    class DatabaseConnection <<Singleton>> {
+        - {static} instance : DatabaseConnection
+        - connection : Connection
+
+        - DatabaseConnection()
+        + {static} getInstance() : DatabaseConnection
+        + getConnection() : Connection
+    }
+}
+
+package factory <<Folder>> #E8FCF7 {
+    class AccountFactory
+}
+
+package exception <<Folder>> #FFECEC {
+    class AccountNotFoundException
+    class InsufficientBalanceException
+    class InvalidAmountException
+}
+
+' Dépendances principales
+' Interface utilisateur
+Main ..> BankConsole
+BankConsole ..> BankService #9333EA
+
+' Couche métier vers les DAO
+BankService -down..> ClientDAO #2563EB
+BankService -down..> AccountDAO #2563EB
+BankService -down..> OperationDAO #2563EB
+
+' Couche métier vers les entités
+BankService ..> Client #line:green
+BankService ..> Account #line:green
+BankService ..> Operation #line:green
+
+' Gestion des exceptions
+BankService -right..> AccountNotFoundException #DC2626
+BankService -right..> InsufficientBalanceException #DC2626
+BankService -right..> InvalidAmountException #DC2626
+
+' DAO vers les entités
+ClientDAO ..> Client #16A34A
+AccountDAO ..> Account #16A34A
+OperationDAO ..> Operation #16A34A
+
+' Singleton
+ClientDAO -left..> DatabaseConnection #D97706
+AccountDAO -left..> DatabaseConnection #D97706
+OperationDAO -left..> DatabaseConnection #D97706
+
+' Factory
+AccountDAO ..> AccountFactory #0D9488
+AccountFactory ..> Account #16A34A
+
+' Liens invisibles pour organiser la disposition
+application -[hidden]down-> business
+business -[hidden]down-> dao
+dao -[hidden]right-> entities
+dao -[hidden]left-> singleton
+business -[hidden]right-> exception
+
+@enduml

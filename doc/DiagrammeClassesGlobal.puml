@@ -54,7 +54,7 @@ package entities <<Folder>> #EAFBF0 {
         - date : LocalDateTime
     }
 
-    Client "1" -- "0..*" Account : possède
+    Client "1" <-- "0..*" Account : appartient à
     Account "1" -- "0..*" Operation
 
     Account <|-- CurrentAccount

@@ -3,30 +3,69 @@
 title TP Bank - Diagramme de classes global
 
 top to bottom direction
+
 skinparam packageStyle rectangle
 skinparam classAttributeIconSize 0
 skinparam shadowing false
-skinparam linetype ortho
-
 skinparam nodesep 60
 skinparam ranksep 60
 
 package application <<Folder>> #EAF4FF {
+
     class Main
+
     class BankConsole
+
 }
 
 package business <<Folder>> #F3ECFF {
+
     class BankService
+
 }
 
 package dao <<Folder>> #EAF0FF {
-    class ClientDAO
-    class AccountDAO
-    class OperationDAO
+
+    interface ClientDAO {
+        + findById(id : int) : Client
+        + findAll() : List<Client>
+    }
+
+    interface AccountDAO {
+        + findById(id : int) : Account
+        + findByClientId(clientId : int) : List<Account>
+        + update(account : Account) : void
+    }
+
+    interface OperationDAO {
+        + save(operation : Operation) : void
+        + findByAccountId(accountId : int) : List<Operation>
+    }
+
+    package impl <<Folder>> #DCE8FF {
+
+        class ClientDAOImpl {
+            - connection : Connection
+        }
+
+        class AccountDAOImpl {
+            - connection : Connection
+        }
+
+        class OperationDAOImpl {
+            - connection : Connection
+        }
+
+    }
+
+    ClientDAO <|.. ClientDAOImpl
+    AccountDAO <|.. AccountDAOImpl
+    OperationDAO <|.. OperationDAOImpl
+
 }
 
 package entities <<Folder>> #EAFBF0 {
+
     class Client {
         - id : int
         - firstName : String
@@ -49,21 +88,21 @@ package entities <<Folder>> #EAFBF0 {
         + calculateInterest() : BigDecimal
     }
 
-class Operation {
-    + {static} DEPOSIT : String {readOnly}
-    + {static} WITHDRAWAL : String {readOnly}
-
-    - id : int
-    - amount : BigDecimal
-    - type : String
-    - date : LocalDateTime
-}
+    class Operation {
+        + {static} DEPOSIT : String {readOnly}
+        + {static} WITHDRAWAL : String {readOnly}
+        - id : int
+        - amount : BigDecimal
+        - type : String
+        - date : LocalDateTime
+    }
 
     Client "1" <-- "0..*" Account : appartient à
     Account "1" <-- "0..*" Operation
 
     Account <|-- CurrentAccount
     Account <|-- SavingsAccount
+
 }
 
 package singleton <<Folder>> #FFF1DD {
@@ -71,69 +110,70 @@ package singleton <<Folder>> #FFF1DD {
     class DatabaseConnection <<Singleton>> {
         - {static} instance : DatabaseConnection
         - url : String
-    	- user : String
-    	- password : String
+        - user : String
+        - password : String
         - connection : Connection
-
         - DatabaseConnection()
         + {static} getInstance() : DatabaseConnection
         + getConnection() : Connection
     }
+
 }
 
 package factory <<Folder>> #E8FCF7 {
+
     class AccountFactory <<Factory>> {
-    + {static} createAccount(type : String, id : int, accountNumber : String, balance : BigDecimal, client : Client, interestRate : BigDecimal) : Account
-}
+        + {static} createAccount(type : String, id : int, accountNumber : String, balance : BigDecimal, client : Client, interestRate : BigDecimal) : Account
+    }
+
 }
 
 package exception <<Folder>> #FFECEC {
+
     class AccountNotFoundException
+
     class InsufficientBalanceException
+
     class InvalidAmountException
+
 }
 
-' Dépendances principales
 ' Interface utilisateur
+
 Main ..> BankConsole
-BankConsole ..> BankService #9333EA
 
-' Couche métier vers les DAO
-BankService -down..> ClientDAO #2563EB
-BankService -down..> AccountDAO #2563EB
-BankService -down..> OperationDAO #2563EB
+BankConsole --> BankService #9333EA
 
-' Couche métier vers les entités
-BankService ..> Client #16A34A
-BankService ..> Account #16A34A
-BankService ..> Operation #16A34A
+' Couche métier vers les interfaces DAO
+
+BankService -down--> ClientDAO #2563EB
+BankService -down--> AccountDAO #2563EB
+BankService -down--> OperationDAO #2563EB
 
 ' Gestion des exceptions
+
 BankService -right..> AccountNotFoundException #DC2626
 BankService -right..> InsufficientBalanceException #DC2626
 BankService -right..> InvalidAmountException #DC2626
 
-' DAO vers les entités
-ClientDAO ..> Client #16A34A
-AccountDAO ..> Account #16A34A
-OperationDAO ..> Operation #16A34A
-
 ' Singleton
-ClientDAO -left..> DatabaseConnection #D97706
-AccountDAO -left..> DatabaseConnection #D97706
-OperationDAO -left..> DatabaseConnection #D97706
+
+ClientDAOImpl -right..> DatabaseConnection #D97706
+AccountDAOImpl -right..> DatabaseConnection #D97706
+OperationDAOImpl -right..> DatabaseConnection #D97706
 
 ' Factory
-AccountDAO ..> AccountFactory #0D9488
-AccountFactory ..> Account #16A34A
-AccountFactory ..> CurrentAccount #16A34A : <<create>>
-AccountFactory ..> SavingsAccount #16A34A : <<create>>
+
+AccountDAOImpl ..> AccountFactory #0D9488
+
+AccountFactory ..> Account #16A34A 
 
 ' Liens invisibles pour organiser la disposition
+
 application -[hidden]down-> business
 business -[hidden]down-> dao
 dao -[hidden]right-> entities
-dao -[hidden]left-> singleton
+dao -[hidden]right-> singleton
 business -[hidden]right-> exception
 
 @enduml

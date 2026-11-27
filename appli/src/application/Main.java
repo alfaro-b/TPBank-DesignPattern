@@ -3,6 +3,12 @@ package application;
 import java.sql.SQLException;
 
 import singleton.DatabaseConnection;
+import java.math.BigDecimal;
+
+import entities.Account;
+import entities.Client;
+import entities.SavingsAccount;
+import factory.AccountFactory;
 
 /**
  * Point d'entrée de l'application bancaire.
@@ -10,7 +16,9 @@ import singleton.DatabaseConnection;
 public class Main {
 
     public static void main(String[] args) {
-
+    	
+    	// Test du Singleton pour la conexion à la bdd
+    	
         try {
             // Premier appel : la connexion est créée
             DatabaseConnection conn1 = DatabaseConnection.getInstance();
@@ -31,6 +39,44 @@ public class Main {
 
         } catch (SQLException e) {
             System.err.println("Erreur de connexion : " + e.getMessage());
+        }
+        
+        // Test de la Factory pour la création d'un compte
+        
+        // Création d'un client de test
+        Client client = new Client(1, "Jean", "Dupont", "jean@email.com");
+
+        // Création d'un compte courant
+        Account account1 = AccountFactory.createAccount(
+                "CURRENT", 1, "FR76300020001",
+                new BigDecimal("1500.50"), client, null);
+
+        // Création d'un compte épargne
+        Account account2 = AccountFactory.createAccount(
+                "SAVINGS", 2, "FR76300020002",
+                new BigDecimal("3200.00"), client,
+                new BigDecimal("0.03"));
+
+        // Vérification des types d'objets créés
+        System.out.println(account1.getClass().getSimpleName());
+        System.out.println(account2.getClass().getSimpleName());
+
+        // Vérification du calcul des intérêts
+        if (account2 instanceof SavingsAccount) {
+            SavingsAccount savingsAccount = (SavingsAccount) account2;
+
+            System.out.println("Intérêts : "
+                    + savingsAccount.calculateInterest() + " euros");
+        }
+        
+     // Vérification de la gestion d'un type de compte invalide
+        try {
+            AccountFactory.createAccount(
+                    "UNKNOWN", 3, "TEST",
+                    new BigDecimal("100.00"), client, null);
+
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
     }
 }

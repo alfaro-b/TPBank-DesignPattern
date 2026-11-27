@@ -1,57 +1,72 @@
-
 @startuml
 
 title TP Bank - Diagramme de packages
 
+top to bottom direction
+
 skinparam shadowing false
+skinparam nodesep 30
+skinparam ranksep 30
 skinparam linetype ortho
-skinparam packageStyle rectangle
 
-
-package "application" as app #EAF4FF {
+folder application #EAF4FF {
     card "Main\nBankConsole"
 }
 
-package "business" as business #F3ECFF {
+folder business #F3ECFF {
     card "Règles métier\nBankService"
 }
 
-package "entities" as entities #EAFBF0 {
+folder dao #EAF0FF {
+
+    card "Interfaces DAO\nContrats d'accès aux données" as daoInterfaces
+
+    folder "impl" as daoImpl #DCE8FF {
+        card "Implémentations DAO\nRequêtes SQL"
+    }
+
+}
+
+folder entities #EAFBF0 {
     card "Client, Account,\nOperation..."
 }
 
-package "dao" as dao #EAF0FF {
-    card "Accès aux données\nRequêtes SQL"
-}
-
-package "singleton" as singleton #FFF1DD {
+folder singleton #FFF1DD {
     card "DatabaseConnection\nGestion de la connexion JDBC"
 }
 
-package "factory" as factory #E8FCF7 {
+folder factory #E8FCF7 {
     card "AccountFactory\nCréation des comptes"
 }
 
-package "exception" as exception #FFECEC {
+folder exception #FFECEC {
     card "Exceptions métier"
 }
 
-database "MySQL" as db #F7F7F7
+database MySQL #F7F7F7
 
 ' Dépendances entre les packages
 
-app ..> business
-business ..> dao
-business ..> entities
+application -down..> business
 
-dao ..> entities
-dao ..> singleton
-dao ..> factory
-
-factory ..> entities
+business -down..> dao
+business -down..> entities
 business -right..> exception
-app ..> exception
 
-singleton -down-> db
+dao -down..> entities
 
+daoImpl -down..> factory
+daoImpl -down..> singleton
+
+factory -down..> entities
+
+singleton -down-> MySQL
+
+' Liens invisibles pour organiser la disposition
+
+application -[hidden]down-> business
+business -[hidden]down-> dao
+
+factory -[hidden]right-> singleton
+entities -[hidden]right-> MySQL
 @enduml

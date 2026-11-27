@@ -16,6 +16,7 @@ package entities {
 
     abstract class Account {
         - id : int
+    	- accountNumber : String
         - balance : BigDecimal
 
         + deposit(amount : BigDecimal) : void

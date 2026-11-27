@@ -36,6 +36,7 @@ package entities <<Folder>> #EAFBF0 {
 
     abstract class Account {
         - id : int
+        - accountNumber : String
         - balance : BigDecimal
         + deposit(amount : BigDecimal) : void
         + withdraw(amount : BigDecimal) : void
@@ -48,12 +49,15 @@ package entities <<Folder>> #EAFBF0 {
         + calculateInterest() : BigDecimal
     }
 
-    class Operation {
-        - id : int
-        - amount : BigDecimal
-        - type : String
-        - date : LocalDateTime
-    }
+class Operation {
+    + {static} DEPOSIT : String {readOnly}
+    + {static} WITHDRAWAL : String {readOnly}
+
+    - id : int
+    - amount : BigDecimal
+    - type : String
+    - date : LocalDateTime
+}
 
     Client "1" <-- "0..*" Account : appartient à
     Account "1" <-- "0..*" Operation
@@ -75,7 +79,9 @@ package singleton <<Folder>> #FFF1DD {
 }
 
 package factory <<Folder>> #E8FCF7 {
-    class AccountFactory
+    class AccountFactory <<Factory>> {
+    + {static} createAccount(type : String, id : int, accountNumber : String, balance : BigDecimal, client : Client, interestRate : BigDecimal) : Account
+}
 }
 
 package exception <<Folder>> #FFECEC {
@@ -95,9 +101,9 @@ BankService -down..> AccountDAO #2563EB
 BankService -down..> OperationDAO #2563EB
 
 ' Couche métier vers les entités
-BankService ..> Client #line:green
-BankService ..> Account #line:green
-BankService ..> Operation #line:green
+BankService ..> Client #16A34A
+BankService ..> Account #16A34A
+BankService ..> Operation #16A34A
 
 ' Gestion des exceptions
 BankService -right..> AccountNotFoundException #DC2626
@@ -117,6 +123,8 @@ OperationDAO -left..> DatabaseConnection #D97706
 ' Factory
 AccountDAO ..> AccountFactory #0D9488
 AccountFactory ..> Account #16A34A
+AccountFactory ..> CurrentAccount #16A34A : <<create>>
+AccountFactory ..> SavingsAccount #16A34A : <<create>>
 
 ' Liens invisibles pour organiser la disposition
 application -[hidden]down-> business

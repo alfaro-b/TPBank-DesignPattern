@@ -13,15 +13,18 @@ public abstract class Account {
     // =========================
 
     private int id;
+    private String accountNumber;
     private BigDecimal balance;
     private Client client;
+    
 
     // =========================
     // CONSTRUCTEUR
     // =========================
 
-    protected Account(int id, BigDecimal balance, Client client) {
+    protected Account(int id, String accountNumber, BigDecimal balance, Client client) {
         this.id = id;
+        this.accountNumber = accountNumber;        
         this.balance = balance;
         this.client = client;
     }
@@ -34,6 +37,10 @@ public abstract class Account {
         return id;
     }
 
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+    
     public BigDecimal getBalance() {
         return balance;
     }
@@ -67,6 +74,7 @@ public abstract class Account {
     @Override
     public String toString() {
         return "Account [id=" + id
+        		+ ", accountNumber=" + accountNumber
                 + ", balance=" + balance
                 + ", client=" + client + "]";
     }

@@ -9,6 +9,8 @@ import entities.Account;
 import entities.Client;
 import entities.SavingsAccount;
 import factory.AccountFactory;
+import dao.ClientDAO;
+import dao.impl.ClientDAOImpl;
 
 /**
  * Point d'entrée de l'application bancaire.
@@ -69,7 +71,7 @@ public class Main {
                     + savingsAccount.calculateInterest() + " euros");
         }
         
-     // Vérification de la gestion d'un type de compte invalide
+        // Vérification de la gestion d'un type de compte invalide
         try {
             AccountFactory.createAccount(
                     "UNKNOWN", 3, "TEST",
@@ -77,6 +79,25 @@ public class Main {
 
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
+        }
+        
+        // Test du DAO pour la récupération des clients
+        try {
+            ClientDAO clientDAO = new ClientDAOImpl();
+
+            // Récupération d'un client par son identifiant
+            System.out.println("\nClient avec l'identifiant 1 :");
+            System.out.println(clientDAO.findById(1));
+
+            // Récupération de tous les clients
+            System.out.println("\nListe des clients :");
+
+            for (Client clientFromDb : clientDAO.findAll()) {
+                System.out.println(clientFromDb);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erreur SQL : " + e.getMessage());
         }
     }
 }

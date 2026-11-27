@@ -20,14 +20,16 @@ SET time_zone = "+00:00";
 --
 -- Base de données : `tp_bank`
 --
-
+CREATE DATABASE IF NOT EXISTS `tp_bank`;
+USE `tp_bank`;
 -- --------------------------------------------------------
-
+DROP TABLE IF EXISTS `operation`;
+DROP TABLE IF EXISTS `compte`;
+DROP TABLE IF EXISTS `client`;
 --
 -- Structure de la table `client`
 --
 
-DROP TABLE IF EXISTS `client`;
 CREATE TABLE IF NOT EXISTS `client` (
   `id` int NOT NULL AUTO_INCREMENT,
   `nom` varchar(50) NOT NULL,
@@ -52,11 +54,12 @@ INSERT INTO `client` (`id`, `nom`, `prenom`, `email`) VALUES
 -- Structure de la table `compte`
 --
 
-DROP TABLE IF EXISTS `compte`;
 CREATE TABLE IF NOT EXISTS `compte` (
   `id` int NOT NULL AUTO_INCREMENT,
   `numero_compte` varchar(50) NOT NULL,
   `solde` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `type_compte` varchar(20) NOT NULL,
+  `taux_interet` decimal(5,4) DEFAULT NULL,
   `client_id` int NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `numero_compte` (`numero_compte`),
@@ -67,11 +70,12 @@ CREATE TABLE IF NOT EXISTS `compte` (
 -- Déchargement des données de la table `compte`
 --
 
-INSERT INTO `compte` (`id`, `numero_compte`, `solde`, `client_id`) VALUES
-(1, 'FR76300020001', 1500.50, 1),
-(2, 'FR76300020002', 3200.00, 1),
-(3, 'FR76300020003', 450.75, 2),
-(4, 'FR76300020004', 12000.00, 3);
+INSERT INTO `compte` 
+(`id`, `numero_compte`, `solde`, `type_compte`, `taux_interet`, `client_id`) VALUES
+(1, 'FR76300020001', 1500.50, 'CURRENT', NULL, 1),
+(2, 'FR76300020002', 3200.00, 'SAVINGS', 0.0300, 1),
+(3, 'FR76300020003', 450.75, 'CURRENT', NULL, 2),
+(4, 'FR76300020004', 12000.00, 'SAVINGS', 0.0250, 3);
 
 -- --------------------------------------------------------
 
@@ -79,29 +83,25 @@ INSERT INTO `compte` (`id`, `numero_compte`, `solde`, `client_id`) VALUES
 -- Structure de la table `operation`
 --
 
-DROP TABLE IF EXISTS `operation`;
 CREATE TABLE IF NOT EXISTS `operation` (
   `id` int NOT NULL AUTO_INCREMENT,
   `type` varchar(20) NOT NULL,
   `montant` decimal(10,2) NOT NULL,
   `date` datetime NOT NULL,
-  `compte_source_id` int NOT NULL,
-  `compte_destinataire_id` int DEFAULT NULL,
+  `compte_id` int NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `fk_operation_source` (`compte_source_id`),
-  KEY `fk_operation_dest` (`compte_destinataire_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `fk_operation_compte` (`compte_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Déchargement des données de la table `operation`
 --
 
-INSERT INTO `operation` (`id`, `type`, `montant`, `date`, `compte_source_id`, `compte_destinataire_id`) VALUES
-(1, 'Depot', 500.00, '2026-06-01 10:15:00', 1, NULL),
-(2, 'Retrait', 100.00, '2026-06-02 14:30:00', 1, NULL),
-(3, 'Virement', 200.00, '2026-06-03 09:00:00', 1, 2),
-(4, 'Depot', 1000.00, '2026-06-04 11:20:00', 3, NULL),
-(5, 'Virement', 1500.00, '2026-06-05 16:45:00', 4, 3);
+INSERT INTO `operation`
+(`id`, `type`, `montant`, `date`, `compte_id`) VALUES
+(1, 'DEPOSIT', 500.00, '2026-06-01 10:15:00', 1),
+(2, 'WITHDRAWAL', 100.00, '2026-06-02 14:30:00', 1),
+(4, 'DEPOSIT', 1000.00, '2026-06-04 11:20:00', 3);
 
 --
 -- Contraintes pour les tables déchargées
@@ -117,8 +117,10 @@ ALTER TABLE `compte`
 -- Contraintes pour la table `operation`
 --
 ALTER TABLE `operation`
-  ADD CONSTRAINT `fk_operation_dest` FOREIGN KEY (`compte_destinataire_id`) REFERENCES `compte` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `fk_operation_source` FOREIGN KEY (`compte_source_id`) REFERENCES `compte` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_operation_compte`
+  FOREIGN KEY (`compte_id`)
+  REFERENCES `compte` (`id`)
+  ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

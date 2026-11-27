@@ -31,6 +31,7 @@ package entities <<Folder>> #EAFBF0 {
         - id : int
         - firstName : String
         - lastName : String
+        - email : String
     }
 
     abstract class Account {

@@ -11,6 +11,7 @@ package entities {
         - id : int
         - firstName : String
         - lastName : String
+        - email : String
     }
 
     abstract class Account {

@@ -13,15 +13,17 @@ public class Client {
 	private int id;
     private String firstName;
     private String lastName;
+    private String email;
     
     // =========================
     // CONSTRUCTEUR
     // =========================    
     
-    public Client(int id, String firstName, String lastName) {
+    public Client(int id, String firstName, String lastName, String email) {
 		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
+		this.email = email;
 	}
     
     // =========================
@@ -50,13 +52,21 @@ public class Client {
 		this.lastName = lastName;
 	}
 	
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	
 	// =========================
     // MÉTHODES
     // =========================
 	
     @Override
 	public String toString() {
-		return "Client [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + "]";
+		return "Client [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email +"]";
 	}
 
 }

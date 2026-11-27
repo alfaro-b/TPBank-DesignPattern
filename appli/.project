@@ -16,6 +16,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>bdd</name>
+			<type>2</type>
+			<location>C:/Users/AlfaroB/Projets/DesignPattern/TPBank/bdd</location>
+		</link>
+		<link>
 			<name>doc</name>
 			<type>2</type>
 			<location>C:/Users/AlfaroB/Projets/DesignPattern/TPBank/doc</location>
